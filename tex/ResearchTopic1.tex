@@ -1,4 +1,485 @@
-\chapter{Research Topic 1}
+\chapter{Bayesian model selection for the \textit{Drosophila} gap gene system \cite{zubair2019}}
 \label{cha:research_topic_1}
 
-\Blindtext[2]
+\section{Background}
+
+The process by which multicellular organisms develop from a single fertilized cell has been the focus of much attention. It was postulated that organisms are patterned by gradients of certain form-producing substances. Boveri \cite{boveri1901} and Horstadius \cite{horstadius35} used this idea to explain the patterning of the sea urchin embryo. The idea was given further impetus by the discovery of the Spemann organizer \cite{spemann24} which suggested that morphogenesis is the result of signals released from localized group of cells. In 1952, Turing, working on the problem of spatial patterning, coined the term morphogen to describe `form-producers'. He used mathematical models to show that chemical substances could self-organize into patterns starting from homogeneous distributions \cite{turing52}. However, a definitive example of a morphogen was only provided in 1987 by the discovery of Bicoid function in the \textit{Drosophila} embryo \cite{nusslein80,nusslein87} and subsequent visualization of its gradient \cite{driever88a,driever88b}. Not surprisingly, patterning in the \textit{Drosophila} embryo has been the focus of both developmental and systems biologists. 
+
+The formation of several broad gap gene \cite{jaeger11} expression patterns within the first two hours of development characterizes early \textit{Drosophila} embryogenesis. Taken together, the gap genes constitute one of the four regulatory layers in the cascade of segmentation pathway in \textit{Drosophila} embryo. Expression of gap genes is regulated by maternal genes \cite{hulskamp90} and they also participate in mutual repression \cite{kraut91}. Thus, activation  by maternal gradients, combined with spatially specific gap-gap cross repression helps to establish, sharpen and maintain the broad overlapping domains of the gap gene expression along the Anterior-Posterior (A-P) axis. The gap gene network is one of the few examples of a developmental gene network which has been studied extensively using data-driven mathematical models \cite{jaeger04b,jaeger09,jaeger12} in order to reconstruct the regulatory structure of the gap gene network. However, there continues to be active discussion \cite{papatsenko08,zinzen07} on how maternal gradients and mutual gap gene repression contribute to the formation of gap stripes. 
+
+Mathematical representation of the gap gene network through quantitative dynamical systems has helped investigate regulatory structure of this network along with specific properties of this representation such as the strength of interaction, cooperativity of regulators, etc. However, there is a deficit of a rigorous framework within which putative representations can be compared and allows one to conduct formal statistics of relative fit. In a seminal paper, Jaeger \textit{et al.} \cite{jaeger04b} used a dynamical model where a genetic inter-connectivity matrix described the regulatory parameters. Based on measures of model fit, they argued that dual regulatory action of Hunchback on Kruppel is not essential for to explain gap gene domain formation. While this may be valid, they do not provide a relative goodness of fit of the model against a representation that assumes dual-regulation. Perkins et al. \cite{jaeger06b} did an extensive study of gap gene regulatory relationships and compared proposed networks in literature. However, their study does not provide a measure of statistical significance for model comparison. Essentially, the question we want to ask is how to chose between competing hypothesis for the network structure in a statistically rigorous manner ? In addition, real data is often contaminated with measurement noise and we need methods that can help us deal with this uncertainty. 
+
+Addressing the latter point, one way to handle error associated with experimental observations is to model it as Gaussian noise. If we know or are willing to assume a model for the error variance, then an estimate of the parameters can be sought by maximizing the likelihood in a least squares sense. This is the maximum likelihood estimate (MLE) \cite{stigler07} of the parameters. However, this point estimate suffers from being unrepresentative and is often intractable, especially if the likelihood is multimodal. 
+An alternative approach is the Bayesian framework which allows one to not only account for experimental error by propagating it to the model parameters but also a way to integrate our prior beliefs on the distribution of model parameters. In this manner, a posterior distribution of the model parameters is obtained which encapsulates our belief in the parameter values given uncertainty in measurement. Indeterminacy of model parameters and correlations between indeterminate parameters are incorporated into the marginal likelihood (evidence). Direct computations of integrals involved in Bayesian methods are difficult and so researchers tend to use Markov chain Monte Carlo (MCMC) methods like Gibbs sampling or Metropolis-Hastings algorithm \cite{hastings70}. Bayesian approaches have enjoyed great success in genetics \cite{beaumont04} and we and others \cite{wilkinson07} expect that they will provide more satisfactory solutions to inference problems in computational systems biology.
+
+In addition, the Bayesian approach allows us to assess which of the competing models is better supported by the data by comparing the ratios of marginal likelihood of the models. The process of comparing models is more formally known as model selection and the ratio of marginal likelihoods is also called the Bayes factor \cite{raftery95}. It follows, that in order to use Bayes factors, one needs to estimate the marginal likelihood of a model.  However, this task becomes increasingly intractable with growing model dimensionality and a conventional Metropolis-Hastings sampling approach generally leads to poor mixing properties and unreliable conclusions. To overcome this difficulty, we use the parallel tempering Markov chain Monte Carlo (PT-MCMC) sampling technique \cite{geyer91}. Briefly, this method runs parallel chains at different temperatures (or degree of smoothness of likelihood surface) and allows exchanges between the chains based on the Hastings ratio. The end result is a chain that mixes well and also doesn’t get stuck in local optima. Another benefit of this approach is that it allows one to use path integration to compute the thermodynamic estimator \cite{meng98} of the marginal likelihood. This estimator has been shown to be reliable when working with Bayes factors \cite{calderhead10} in the context of differential equations. 
+
+We currently focus on the Papatsenko-Levine formalism \cite{papatsenko11}, which exploits a fractional occupancy based approach to incorporate activation of the gap genes by the maternal genes and cross-regulation by the gap genes themselves. An advantage of this formalism is that it incorporates non-linear effects between regulatory interactions and is closer to a mechanistic view of how regulation in this system occurs \cite{jaeger06a}. While in their paper, Papatsenko \& Levine assumed that network structure is known \textit{a priori}, our approach allows one to choose from competing network topologies reported in the literature and to vary strength of interactions between gap genes. It is worth mentioning here that although we consider models of increasing complexity, Bayes factors allows model comparison without concerns of over-fitting, that is, they allow one to implicitly control for model dimensionality \cite{jeffreys92}.	
+
+\section{Methods}
+
+\subsection{Expression Data}
+
+We use published data by Papatsenko \& Levine \cite{papatsenko11}. This data was obtained from the FlyEx database \cite{pisarev09}. The data comprise of expression values on a line along the Anterior-Posterior axis of the embryo and subsampled to 100 spatial points separated by approximately $5\mu m$. Maternal Bicoid (Bcd) and Hunchback (Hb) expression data corresponding to cleavage cycle 14.1 were used as input to the model. The output data is gap gene zygotic expression at cleavage cycle 14.4 for Hunchback, Kruppel (Kr), Knirps (Kni) and Giant (Gt) (fig. 1). Tailless (Tll) expression data corresponding to cleavage cycle 14.4 was also used as input. 
+
+\begin{figure}
+    \centering
+    \includegraphics[scale = 3.0]{tex/embryo/figure-1.jpg}
+    \caption{Expression data: Gap gene expression values at cleavage cycle 14.4 along the anterior-posterior axis of developing embryo are used to fit the model.}
+    \label{fig:figure-1}
+\end{figure}
+
+\subsection{Models}
+
+Time-varying systems can be modeled with ordinary differential equations (ODEs) which have efficient solvers available (for example, \cite{hindmarsh05}) . However, in pattern formation gene expression varies both in time and space and partial differential equations (PDEs) are the suitable method for characterizing this process. Closed form solutions for PDEs exist only in the most simplest of cases and numerical solutions need to be employed. Packaged solvers for PDEs do exist \cite{GWAT:GWAT584} and some like deal.II \cite{Bangerth2007} have been used in systems biology applications \cite{garikipati2017, murphy2018, albert2014}. However, due to the overhead of generalizability and computational tractability in structuring models, we wrote our own solver.
+
+We first elaborate the PDE formalism, due to Papatsenko \& Levine, used for describing gap gene expression:
+
+\begin{align*}
+	\frac{\partial }{\partial t}u_{i}(x,t) &= \alpha P_{i}^{A}(1 - P_{i}^{B}) - \beta u_{i}(x,t) + D \frac{\partial^2 u_{i}(x,t)}{\partial x^2}, \\
+	i &= Hb, Kr, Kni, Gt, \\
+	u'(0,t) &= u'(L,t) = 0, u' = \frac{\partial u}{\partial x}, \\
+	0 &< x < L, 0 < t < T.
+\end{align*}
+
+Here, $u_{i}(x,t)$ represents the expression of gap gene, $i$, at time $t$ and position $x$ with Neumann boundary conditions, i.e., we assume that flux at the boundaries is zero.  $\alpha$ represents the production rate, $\beta$ is the linear decay rate and $D$ is the diffusion constant. $L$ denotes the length of the embryo and $T$ corresponds to cleavage cycle 14.4 which marks the start of gastrulation. $P^A$ and $P^B$ are respectively combined activation and repression effects of regulators for each gap gene. These regulatory effects are a function of the gap gene expression and its binding affinity ($K$), cooperativity rate ($C_o$) and the number of binding sites ($N_s$). (Details in the supplementary text.) 
+
+We reformulate the system in weak or variational form \cite{lions71} and then rely on the theory of linear semigroups of operators \cite{pazy83}. We, first, expand on the regulatory framework used and some important points relating to normalizaiton and then proceed to provide the full solution for the system of PDEs.
+
+\subsubsection{Regulatory Framework}
+
+For a group of $N_s$ cooperating ($C_o$ - cooperativity fold, $C_o \epsilon [1, \infty]$) equal binding sites, all with binding constant K, the probability of occupancy of at least one site in the group is equal to \cite{zinzen06}:
+$$p\left([A], K, C_o, N_s\right) = 1 - \frac{C_o}{C_o + (1+C_o K [A])^{N_s} - 1}.$$
+According to this framework, $p$ is proportional to the probability of activation of a gene, regulated by the transcriptional activator A. If A is a transcriptional repressor, the the probability of repression of the downstream gene is $1 - p$. If gene expression is outcome of several regulatory events and they are all required for expression, then the synthesis rate, $P$, of the gene is given by the product of activation from $i$ site arrays for $i$ activators and repression from $j$ site arrays for $j$ repressors as follows \cite{bolouri08}:
+$$P = \prod _i p_i^{act} \prod_j \left( 1 - p_j^{rep} \right ),$$
+where $p^{act}_i$ is the occupancy probability of activator $i$ and $p^{rep}_j$ is the occupancy probability of activator $j$.
+Input integration using multiple independent activators can be expressed using the following:
+$$P = 1 - \prod_i \left( 1 - p_i^{act} \right ).$$ 
+Here, we give an example to mathematically construct the regulatory information for the gap gene Giant (Gt). For more details, please refer to \cite{papatsenko11}.
+\begin{figure}[H]
+  \centering
+	\includegraphics[scale=0.55]{embryo/giant_activation.png}
+  \caption{Regulatory interactions of Giant. Giant is activated by the maternal genes, bicoid and caudal, in a OR manner. It is repressed by the gap gene, Kruppel.}
+\label{fig:giant_activation}
+\end{figure}
+As depicted in fig. \ref{fig:giant_activation}, Giant (Gt) is activated by the presence of either of the maternal genes, Bicoid or Caudal, (OR activation). In addition, Giant is repressed by the action of of Kruppel. Based on this scheme, we can formulate the rate of Giant production as:
+$$P^{Gt} = (1 - (1 - p^{Bcd})(1 - p^{Cad}))(1 - p^{Kr}),$$
+\begin{align*}
+P^{Gt} = &(1-\frac{C_o^{Bcd}}{C_o^{Bcd} + (1+C_o^{Bcd} K^{Bcd} [Bcd])^{N_s^{Bcd}} - 1}*\frac{C_o^{Cad}}{C_o^{Cad} + (1+C_o^{Cad} K^{Cad} [Cad])^{N_s^{Cad}} - 1})\\
+&*(\frac{C_o^{Kr}}{C_o^{Kr} + (1+C_o^{Kr} K^{Kr} [Kr])^{N_s^{Kr}} - 1}).
+\end{align*}
+
+\subsubsection{Model Equations}
+Assuming the constants defined in table \ref{tab:table1}, we provide the complete partial differential equations associated with each of the gap genes. \\
+Hunchback (Hb):
+\begin{align*}
+\frac{\partial }{\partial x}[Hb] &= \alpha \left ( (1 - \frac{C_o}{C_o + (1 + C_oK_3[Bcd])^{N_s} -1})(1 - \frac{C_o}{C_o + (1 + C_oK[Hb])^{N_s} -1})\right )\\ & \left ( (\frac{C_o}{C_o + (1 + C_oK[Kni])^{N_s} -1}) \right )\\
+&- \beta [Hb] + D/L^2 \frac{\partial^2 [Hb]}{\partial x^2}.
+\end{align*}
+Knirps (Kni):
+\begin{align*}
+\frac{\partial }{\partial x}[Kni] &= \alpha \left ( (1 - \frac{C_o}{C_o + (1 + C_oK_3[Bcd])^{N_s} -1})(\frac{C_o}{C_o + (1 + C_oK_1[Hb])^{N_s} -1})\right)\\& \left ( (\frac{C_o}{C_o + (1 + C_oK[Tll])^{N_s} -1}) \right )\\ 
+&- \beta [Kni] + D/L^2 \frac{\partial^2 [Kni]}{\partial x^2}.
+\end{align*}
+Kruppel (Kr):
+\begin{align*}
+\frac{\partial }{\partial x}[Kr] &= \alpha \left ( (1 - \frac{C_o}{C_o + (1 + C_oK[Hb])^{N_s} -1})(\frac{C_o}{C_o + (1 + C_oK[Hb])^{N_s} -1})\right)\\&\left((\frac{C_o}{C_o + (1 + C_oK[Gt])^{N_s} -1}) \right )\\ 
+&- \beta [Kr] + D/L^2 \frac{\partial^2 [Kr]}{\partial x^2}.
+\end{align*}
+Giant (Gt):
+\begin{align*}
+\frac{\partial }{\partial x}[Gt] &= \alpha  \biggl( (1 - (1 - \frac{C_o}{C_o + (1 + C_oK_3[Bcd])^{N_s} -1}*\frac{C_o}{C_o + (1 + C_oK[Hb])^{N_s} -1}))  \\
+ &(\frac{C_o}{C_o + (1 + C_oK_2[Kr])^{N_s} -1})(\frac{C_o}{C_o + (1 + C_oK[Tll])^{N_s} -1}) \biggr) - \beta [Gt] + D/L^2 \frac{\partial^2 [Gt]}{\partial x^2}.
+\end{align*}
+To produce the base model A6, $K_3$ is set to equal $K$ and $K_2$ is set to equal $K_1$. Further models are derived according to specifications in Table 1 of the main section. To include the activation of kruppel by bicoid, the equation of kruppel above is modified to the following:
+\begin{align*}
+\frac{\partial }{\partial x}[Kr] &= \alpha \biggl ( (1 - \frac{C_o}{C_o + (1 + C_oK_3[Bcd])^{N_s} -1})(1 - \frac{C_o}{C_o + (1 + C_oK[Hb])^{N_s} -1})\\
+&(\frac{C_o}{C_o + (1 + C_oK[Hb])^{N_s} -1})(\frac{C_o}{C_o + (1 + C_oK[Gt])^{N_s} -1}) \biggr ) - \beta [Kr] + D/L^2 \frac{\partial^2 [Kr]}{\partial x^2}.
+\end{align*}
+
+Here, $[Bcd], [Tll]$ are the concentrations of maternal genes bicoid and tailless respectively. All concentrations are function of space and time, i.e.:
+$$[A] \equiv [A](x, t)$$
+
+\subsubsection{Normalization}
+We assume equal synthesis rates for all four gab genes. This value is also same as the deacy rate for each of the gap genes. Further, Papatsenko and Levine \cite{papatsenko11} assumed that the gap genes undergo similar activation at the beginning of their expression. This assumption can be handled by applying a normalization constant to the production term. Specifically, we pre-multiply the synthesis rate of gap gene $[A]$ with $\omega^A$:
+\begin{align*}
+\frac{\partial }{\partial t}[A] &= \omega^A \alpha P_{A}^{act}(1 - P_{A}^{rep}) - \beta [A] + D/L^2 \frac{\partial^2 [A]}{\partial x^2},\\
+\omega^A &= \frac{1}{Max(P^{act}(x|t=0,K,C_o,N_s))}.
+\end{align*}
+\subsection{Model Solution}
+We provide here the complete solution to the reaction-diffusion equation describing gap gene expression. We first do a change of variables to dimensionless space $x \rightarrow x/L$, where L is the length of the embryo, and rewrite the equation as:
+\begin{align}
+\frac{\partial }{\partial t}u_{i}(x,t) &= \alpha P_{i}^{A}(1 - P_{i}^{B}) - \beta u_{i}(x,t) + D/L^2 \frac{\partial^2 u_{i}(x,t)}{\partial x^2} ,\\ 
+i &= Hb, Kr, Kni, Gt , \nonumber \\
+u'(0,t) &= u'(1,t) = 0, u' =  \frac{\partial u}{\partial x} , \nonumber\\
+0 &< x < 1, 0 < t < T. \nonumber
+\end{align}
+%\begin{eqnarray*}
+%\frac{\partial }{\partial t}y_{i}(x,t) = \alpha P_{i}^{A}(1 - P_{i}^{B}) - \beta y_{i}(x,t) + D/L^2 %\frac{\partial^2 y_{i}(x,t)}{\partial x^2}, \\
+%i = Hb, Kr, Kni, Gt\\
+%0 < x < 1, 0 < t < T\\
+%y'(0,t) = y'(1,t) = 0
+%\end{eqnarray*}
+Stated this way, the expression of gap genes is a system of non-linear partial differential equations (PDEs). For convenience, in the following derivation we drop the subscript $i$ and set $f = \alpha P_{i}^{A}(1 - P_{i}^{B})$ to capture the non-linearity in the system. The time differential of the concentration, $u$, is represented by $u_t$. Thus, we can write the above equation in the weak form as:
+\begin{eqnarray*}
+<u_t, v> &=& <f, v> - \beta <u, v> + D/L^2 <u_{xx}, v> .
+\end{eqnarray*}
+Integrating by parts, we can re-write the above as:
+\begin{eqnarray*}
+<u_t, v> &=& <f, v> - \beta <u, v> - D/L^2 <u_x, v_x>.
+\end{eqnarray*}
+We use the finite element subspace, $V_h = span \{ \phi _i | 1  \leq i \leq n\}$ and approximate the solution with $u^n = \sum_{j=0}^{n}u_j \phi _j$ where, for $i = 1 \cdots n-1$:
+\begin{equation*}
+    \phi_i(x) = 
+\begin{cases}
+    nx - (i-1) ,& \frac{i-1}{n} \leq x \leq \frac{i}{n}\\
+    (i+1) - nx ,& \frac{i}{n} \leq x \leq \frac{i+1}{n}\\
+    0,              & \text{otherwise}
+\end{cases}
+\end{equation*}
+and
+\begin{equation*}
+    \phi_0(x) = 
+\begin{cases}
+    1 - nx ,& 0 \leq x \leq \frac{1}{n}\\
+    0,              & \text{otherwise},
+\end{cases}
+\end{equation*}
+
+\begin{equation*}
+    \phi_n(x) = 
+\begin{cases}
+    nx - (n-1) ,& \frac{n-1}{n} \leq x \leq 1\\
+    0,              & \text{otherwise}.
+\end{cases}
+\end{equation*}
+Given the basis, we can write the finite element method as:
+$$\sum_{j=0}^{n}(u_j)_t< \phi _j, \phi _i> = <f, \phi _i> - \sum_{j=0}^{n}u_j( \beta <\phi _j, \phi _i> + D/L^2 <\phi' _j, \phi' _i> ).$$ 
+% say that u^n is the discrete case or projection into the finite element subspace
+Rewriting in matrix form, where the superscript, $n$ , now indicates that we are working in the subspace $V_h$, 
+\begin{eqnarray}
+M^n u_t^n &=& -(\beta M^n + (D/L^2)K^n)u^n + F \nonumber \\
+% describe these matrices. 
+u_t^n &=& -(\beta I + (D/L^2)(M^n)^{-1}K^n)u^n + (M^n)^{-1} F \nonumber \\
+u_t^n &=& -A^nu^n + F^n.
+\end{eqnarray}
+Here, $F = \left(<f, \phi_1>, <f, \phi_2>, \cdots, <f, \phi_n> \right )'$ and 
+\begin{align*}
+M^n &= [M^n_{ij}] = [<\phi_j, \phi_i>],\\
+K^n &= [K^n_{ij}] = [<\phi'_j, \phi'_i>],\\
+A^n &= \beta I + (D/L^2)(M^n)^{-1}K^n\\
+F^n &= (M^n)^{-1} F.
+\end{align*}
+We can now use the integrating factor method to solve the above ordinary differential equation in (2.2). Consider an interval $\tau$ in which we study the system. We can divide the total time $T$ into $T/\tau$ such intervals and examine the system at the $k^{th}$ step where $u_k^n = u^n(k\tau )$. Using this formulation, we write:
+% say that you are solving an ODE
+\begin{eqnarray}
+u^n_{k+1} &=& u^n((k+1)\tau ) \nonumber \\
+&=& e^{A^n\tau }u^n(k\tau ) + \int_{k\tau }^{(k + 1)\tau } e^{A^n((k+1)\tau -s)}F^n(u^n(s))ds \nonumber \\ 
+&\approx& e^{A^n\tau }u^n(k\tau ) + \int_{k\tau }^{(k + 1)\tau } e^{A^n((k+1)\tau -s)}dsF^n(u^n(k\tau )) \nonumber \\
+&\approx& e^{A^n\tau }u^n(k\tau ) + \int_{0}^{\tau } e^{A^ns}dsF^n(u^n_k) \nonumber\\
+\Rightarrow u^n_{k+1} &\approx& \Phi^n u^n_k + B^nF^n(u^n_k)
+\end{eqnarray}
+As $A^n$ is invertible, the integral $B^n = \int_{0}^{\tau } e^{A^ns}ds$ is evaluated to be $(A^n)^{-1}(e^{A^n\tau} - I)$. Equation (2.3) now provides an iterative solution for the PDE expressed in (2.1).
+
+
+\subsection{Parameter Estimation}
+The observed data is assumed to have some noise $\epsilon$, which we take to be identically normally distributed, $\epsilon \sim N(0, \sigma ^2I)$, (where $I$ is the identity matrix). If the observed data is $Y$ and $U$ is the solution to the system of PDEs, we have:
+\begin{align*}
+Y_{i} &= U_{i}(x,T) + \epsilon, \\
+i &= Hb, Kr, Kni, Gt, \\
+0 &< x < L.
+\end{align*}
+
+Following the above formulation, we can define the likelihood function, $L(\theta, Y)$, which gives the conditional probability of the data, $Y$, given the parameter, $\theta$. Here we have the dropped the subscript $i$ for gap genes for the sake of convenience. Given the assumed error model, the likelihood can be written down explicitly as 
+$$L(\theta, Y) = p(Y | \theta)  = \prod_{j=1}^{N} \frac{1}{\sqrt{2 \pi \sigma ^2}} \textup{exp}(-\frac{1}{2 \sigma ^2}(y_j - u_j)^2).$$
+
+We note that we apply the error model for specific domains over the embryo length (e.l.) . Specifically, the domains used for the gap genes are 30-70 \% e.l. for Hb, 40-90 \% e.l. for Kni, 20-80 \% e.l. for Kr and 10-90 \% e.l. for Gt. The posterior incorporates both how well the parameters support the data and also our existing knowledge of them. This can be expressed more mathematically using Bayes' theorem \cite{bayes63}:
+$$p(\theta | Y) = \frac{L(\theta, Y) \pi(\theta )}{p(Y)}$$
+where
+\begin{itemize}
+\item $p(\theta | Y)$ is the posterior density of the parameters
+\item $L(\theta; Y)$ is the likelihood of the data as elaborated above
+\item $\pi (\theta )$ is the prior belief of the parameter
+\item $p(Y)$ is the marginal likelihood 
+\end{itemize}
+
+At first glance, it would appear straightforward to use Bayes' theorem to compute the posterior density of the parameters. However, the marginal likelihood term in the denominator is often hard to evaluate numerically and mostly intractable as it involves an integration of the likelihood over the whole parameter space:
+
+$$p(Y) = \int_{\Theta} L(\theta, Y) \pi(\theta ) d\theta .$$
+
+Instead, we rely on the Markov chain Monte Carlo \cite{gilks95} method used for high-dimensional sampling. The idea behind these methods is to draw samples from the stationary distribution of a Markov chain. When set up correctly, this distribution produces samples from the posterior distribution. The marginal likelihood itself, however, is relevant for model selection and we will return to its estimation in the section on model selection.
+
+\subsubsection{Metropolis-Hastings Sampling}
+
+The Metropolis-Hastings algorithm \cite{hastings70} provides a procedure to draw samples from the target distribution based on a proposal density. When the appropriate target density is defined, this amounts to generating samples from the posterior distribution of the dynamic model of interest. The MH algorithm achieves this by suggesting moves based on a proposal distribution, $q(\theta _{i+1}|\theta _{i})$, for the Markov chain which proposes a new value for $\theta_{i+1}$ conditional on the current value of $\theta_i$. These moves are accepted based on the Hastings ratio:
+
+$$a_{hr} = min\left \{ 1, \frac{p(\theta _{i+1}| Y) q(\theta _{i}| \theta _{i+1})}{p(\theta _{i}| Y) q(\theta _{i+1}| \theta _{i})} \right \} = min\left \{ 1, \frac{L(\theta _{i+1}, Y) \pi(\theta _{i+1})q(\theta _{i}| \theta _{i+1})}{L(\theta _{i}, Y) \pi(\theta _{i})q(\theta _{i+1}| \theta _{i})} \right \} .$$
+
+The terms are as defined previously and we note that the marginal likelihood term has conveniently canceled out in denominator. The proposal $q(\cdot | \cdot)$ is usually taken to be a Gaussian, however, we note that in our case, the number of sites parameter, $N_s$, is discrete. Accordingly, we define the proposal density as a mixed density. With probability, $p < 1/10$, we perturb $N_s$ by either increasing or decreasing it by 1 with equal probability, while keeping the rest of the parameters unchanged. Else, we perturb each of the other parameters based on a Gaussian centered at the current value of the parameters, $\theta _{i}$ and with variance $0.1I$, where I is the identity matrix. We use bounded uniform prior on all the parameters.
+
+\subsubsection{Parallel Tempered MCMC Sampling}
+
+In principle, given a large number of samples, the Metropolis-Hastings sampler should be able to cover the whole parameter space. However, in high dimensions, the number of samples required increases rapidly and there is always the chance of the chain getting stuck in local optima. To get around these issues, it has been proposed to use multiple interacting MCMC chains \cite{geyer91}. One such approach is of parallel tempering where parallel MCMC chains are run at different 'temperatures'. The range of temperatures that are used is referred to as the temperature ladder. The likelihood for a chain at temperature $t$ is now given by:
+
+$$L_{t}(\theta, Y) = p_{t}(Y| \theta) = p(Y| \theta)^{t}.$$
+
+Since the likelihood function is smoother for higher temperatures, chains at higher temperature can sample the parameter space more freely. The chains are updated using a Metropolis Hastings update step and chains at neighbouring temperatures are exchanged using an acceptance ratio. For implementation purposes, we follow the approach in \cite{calderhead12} with a slight modification. Algorithmically:
+
+\begin{enumerate}
+\item Initial start positions are assigned to each chain, $\Theta = (\theta_{1}, \ldots, \theta_{N})$
+\item Associate each chain with a temperature based on a temperature ladder, $(\Theta, t) = (\theta_{1}, t_{1}, \ldots \theta_{N}, t_{N})$
+\item Repeat till convergence of all chains
+\begin{enumerate}
+\item Apply local Metropolis-Hastings update step to each chain
+\item Pick two neighboring chains at different temperature. Assume states $\theta_{i}$ and $\theta_{j}$ for N pairs $(i, j)$ with $i$ sampled uniformly in $(1, \ldots , N)$ and $j=i \pm 1$ with probability $p_{e}(\theta_i, \theta_j)$ where $p_{e}(\theta_i, \theta_{i+1}) = p_{e}(\theta_i, \theta_{i-1}) = 0.5$ and $p_{e}(\theta_{1}, \theta_2) = p_{e}(\theta_{N}, \theta_{N-1}) = 1$
+\item Exchange the state of the chains based on acceptance ratio
+\end{enumerate}
+\item Use chain with lowest temperature for estimating posterior density
+\end{enumerate}
+
+The exchange step is accepted with probability $min(1, a_{e})$ according to the Metropolis-Hastings rule:
+
+$$a_{e} = \frac{p(\Theta '|Y)Q(\Theta | \Theta ')}{p(\Theta |Y)Q(\Theta '| \Theta)} = \frac{[L(\theta_{j},Y)^{t_i}*L(\theta_{i},Y)^{t_j}]}{[L(\theta_{i},Y)^{t_i}*L(\theta_{j},Y)^{t_j}]}* \frac{Q(\Theta | \Theta ')}{Q(\Theta '| \Theta)}$$
+
+where $Q(\cdot |\cdot )$ denotes the probability of transition from a set of chains to a set with a neighboring pair of chains exchanged. We select direct neighbors in the temperature ladder for the exchange step to increase the likelihood for the exchange to be accepted. 
+
+While the chain at the lowest temperature can be used for parameter inference, all the chains together can be used to estimate the marginal likelihood \cite{calderhead10} and in turn calculate Bayes factors for Bayesian model comparison for model ranking. After providing an example to illustrate the benefits of PT-MCMC, we turn to the aspect of model selection.
+
+\subsubsection{Example}
+
+To see the power of the PT-MCMC approach, we generate samples from a test function as suggested by Wilkinson \cite{wilkinson}. This test function corresponds to the density function of the double-well potential:
+
+$$\rho(x) \propto exp \left \{ - \gamma (x^2 - 1)^2 \right \}.$$
+
+The density function is inspired from a physical setting but those details are not important to us. We plot in fig. \ref{fig:density} the shape of the density plot for $\gamma = 4$.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.55]{embryo/density_plot.png}
+\caption{Unnormalized density function for the double potential well. ($\gamma = 4$)}
+\label{fig:density}
+\end{figure}
+
+We note that the density function has two modes and the strength of the separation of the two modes depends on the $\gamma$ parameter. Higher the value of the gamma parameter, the more separated are the modes. Thus, we expect that at higher values of $\gamma$, it would be increasingly difficult to recover the true distribution using a MH-MCMC sampler. This is because there is an higher possibility of a sampler getting stuck in one of the two modes. 
+
+To test this idea we ran 10,000 iterations for each sampler, MH-MCMC and PT-MCMC. The results are shown in fig. \ref{fig:mh-mcmc} and fig. \ref{fig:pt-mcmc} for MH-MCMC and PT-MCMC respectively. The first column in these figures shows the true distribution that we want to sample from. This represents the density function of the double-well potential with increasing $\gamma$. As can be seen, the two modes of the function get more and more isolated as $\gamma$ increases. A good diagnostic of convergence is the trace plot which is the time series of the samples from the MCMC sampler. This has been plotted in the third column. Finally, we plot the distribution recovered from each sampler in the second column. 
+
+As can be seen in fig. \ref{fig:mh-mcmc}, at a $\gamma$ value of 8, the MH-MCMC sampler has difficulty sampling from the true distribution and starts rapidly switching between the two modes. At a $\gamma$ value of 16, the MH-MCMC sampler samples only from one mode. What is worse is that looking at the corresponding trace plot, one could surmise that convergence has been achieved which would be erroneous. In contrast, looking at fig. \ref{fig:pt-mcmc}, we can see that the PT-MCMC has no difficulty to sample from the true distribution at all values of $\gamma$. Furthermore, the trace plot indicates that convergence has been truly reached. 
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.55]{tex/embryo/dble_potn_well.png}
+\caption{Metropolis-Hastings (MH-MCMC) sampling for the density of the double potential well.}
+\label{fig:mh-mcmc}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.55]{tex/embryo/dble_potn_well_ptmcmc.png}
+\caption{PT-MCMC sampling for the density of the double potential well.}
+\label{fig:pt-mcmc}
+\end{figure}
+
+\subsection {Model Selection}
+
+In the context of Bayesian inference, Bayes factors can be employed to do model selection. They allow us to compute the posterior probabilities of two models, given the prior probability of each model. Assuming again that the data is $Y$, and we want to compare between two models, $M_{1}$ and $M_{2}$, then the posterior odds are given by:
+
+$$\frac{p(M_1|Y)}{p(M_2|Y)} = \left (\frac{p(Y|M_{1})}{p(Y|M_{2})}  \right ) \frac{p(M_1)}{p(M_2)}.$$
+
+The quantity in brackets is the ratio of the marginal likelihoods of the two models and is termed the Bayes factors. When we have no prior preference of one model over the other, we assume $p(M_1) = p(M_2)$ and then the ratio of likelihoods is exactly equal to the Bayes factor. In essence, then, the problem of model selection boils down to the problem of estimating the marginal likelihood.
+
+Various methods to estimate the marginal likelihood have been proposed \cite{girolami08a, girolami08b}. In the simplest construction, given samples from the prior $\theta_1 ,\theta_2 , ..., \theta_n $, one could compute the Monte Carlo estimate
+
+$$\hat{p}(Y) = \frac{1}{n}\sum_{i=1}^{n}p(Y|\theta_i).$$
+
+However, in practice this is a poor estimator unless working with very large sample sizes. Similarly, the importance sampling based the posterior harmonic mean estimator has been shown \cite{girolami08b, meng96} to be a very poor estimator. 
+
+Instead, we could exploit the tempered distributions that we have generated using the PT-MCMC sampler. This approach has been referred to as path sampling \cite{meng96, meng98}. If we assume that the marginal likelihood of chain at temperature $t$ is represented as $z_t$, then:
+
+%$$p(Y) = z_N = \frac{z_1}{z_0}\cdot\frac{z_2}{z_1}\cdots\frac{z_N}{z_{N-1}}$$
+%where 
+%$$\frac{z_{i+1}}{z_i} = \frac{\int_{\Theta} p(\theta) p(y|\theta)^{t_i+1}d\theta}{z_i} = \int_{\Theta}p(y|\theta)^{t_{i+1} - t_i} \cdot \frac{p(y|\theta)^t_i p(\theta)}{z_i} d\theta = E_i[p(y|\theta)^{t_{i+1} - t_i}]$$
+
+$$z_t = z(t) = \int_{\Theta} p(Y|\theta)^{t}\pi(\theta) d\theta .$$
+
+By differentiating the logarithm of $z$,
+
+$$\frac{d}{dt}\text{log}z_t = \int_{\Theta}\text{log}(p(Y|\theta)) \cdot \frac{p(Y|\theta)^t \pi(\theta)}{z_t} d\theta = E_t[\text{log}(p(Y|\theta))]$$
+
+and then we can integrate both sides with respect to $t$ to obtain:
+
+$$\text{log}(p(Y)) = \int_{0}^{1}E_t[\text{log}(p(Y|\theta))]dt$$ 
+
+as described in \cite{girolami08a}. Thus, if we choose a temperature ladder $(0 = t_0 < t_1 < t_2 < ... < t_{N-1} < t_N = 1)$, then we can use a numerical approximation to compute the above integral. Namely, 
+$$\text{log}(p(Y)) = \sum_{i=1}^{N-1}0.5(t_{i+1} - t_i)\left \{ E_{t_{i+1}}[\text{log}(p(Y|\theta))] + E_{t_{i}}[\text{log}(p(Y|\theta))] \right \}.$$
+The expectation with respect to the posterior at each temperature on the ladder can be approximated using the Monte Carlo estimate. For all the models we used a temperature schedule with $N = 10$ according to an exponential ladder $t_i = (\frac{i}{N})^5, i = 1, ..., N$ as suggested in \cite{calderhead10}.
+%Thus, working with the $log$ of the marginal likelihood, we can write:
+%$$\textup{log}p(Y) = \sum_{i=0}^{N-1}\textup{log}\frac{z_{i+1}}{z_i} = \sum_{i=0}^{N-1}\textup{log}E_i[p(y|\theta)^{t_{i+1} - t_i}]$$
+%$$= \sum_{i=0}^{N-1}\textup{log}E_i[\textup{exp}\left \{ (t_{i+1} - t_i) \textup{log} p(y|\theta) \right \}]$$
+%$$\approx \sum_{i=0}^{N-1}(t_{i+1}-t_i)E_i[\textup{log}p(y|\theta)]$$
+%The above formula can then be used to estimate the marginal likelihood and hence, to obtain estimates of the Bayes Factor between two competing models.
+
+\subsection{Model Over-fitting}
+
+The process of model selection described above helps guard against choosing over-parameterized models by penalizing them implicitly for higher dimensionality. This ability of Bayes factors to prioritize simpler models over complex ones has also been discussed elsewhere \cite{jeffreys92,girolami08a}. 
+
+However, as we consider relative goodness of fit amongst models, there might still be an argument that the best chosen model does over-fit the data. One way to test model over-fitting is cross-validation \cite{Kohavi95astudy}. In such an approach, usually, we can envisage excluding some of the data (validation set) during model fitting step  and then testing the accuracy of the model on this held-out data set. An over-fit model would perform well on the fitted data but poorly on the held-out dataset. 
+
+However, as we deal with a spatially correlated dataset, cross-validation becomes more difficult as leaving out an observation does not remove all the associated information. In order to compute a cross-validation statistic, we use an iterative procedure. We use the mean log-likelihood as a measure of prediction accuracy. 
+
+\begin{enumerate}
+\item We fit the model to the data $y_1, \cdots, y_m$, where $m$ is chosen such that $1, \cdots, m$ corresponds to the first 60\% of the data, drawn sequentially across the embryo axis.
+\item We use the fitted model to predict for the next 5\% of observations and compute the log-likelihood.
+\item Repeat steps 1 \& 2, adding 5\% of the data set to training set and predict the next 5\%. 
+\item Finally, compute the mean log-likelihood from the predictions made above.
+\end{enumerate}
+
+As our data is stratified, we ensure that the training set draws evenly from expression observation of the gap genes, i.e. we pick the initial 60\% of the observations from each of the four gap genes to train the model. Similarly, predictions are made on the next 5\% of the observations for each gap gene.
+
+The models, solver and MCMC sampler were coded using the python programming language. PyMC \cite{patil10} was used for certain diagnostic visualizations. The code for reproducing the analysis is available on GitHub at the repository:\\ \href{https://github.com/asifzubair/BayesianModelSelection}{https://github.com/asifzubair/BayesianModelSelection}. 
+
+\section{Results and Discussion}
+
+The \textit{Drosophila} gap gene network has been the subject of intense study from both experimentalists and computational modelers. Despite this, efforts to compare proposed network hypothesis in a statistically rigorous manner have been few and far between. Here, we propose to use the Bayesian framework for doing parameter inference and model selection. The Bayesian framework permits one to do a fully probabilistic analysis of model system allowing one to account for uncertainty in parameter estimates and model fit. We employ an MCMC approach using the parallel tempering (PT-MCMC) sampler to do Bayesian analysis. This sampler not only allows for better convergence but also helps one to compute the thermodynamic estimator for marginal likelihood. Other sampling approaches for accelerating convergence like adaptive MCMC \cite{Andrieu2008} and Hamiltonian Monte Carlo (HMC) \cite{Betancourt_A_2017} exist. However, these samplers require all the parameters to be continuous whereas the PT-MCMC sampler does not have such a restriction. In addition, they do not have the benefit of providing a natural way to estimate the marginal likelihood like the PT-MCMC sampler does. Using estimates of the marginal likelihood, we use Bayes factor to compare between models. 
+
+Papatsenko \& Levine  argued that if the gene expression model is robust to the parameter values, then a single set of robust parameters should provide good model fits. In keeping with this, we set parameters related to maximal synthesis ($\alpha$),  decay ($\beta$), cooperativity rates ($C_o$) and diffusion ($D$) to be the same for all gap genes. In addition, we set the number of binding sites ($N_s$) to be the same. This forms the base model of 6 parameters (Model A6). Thereafter, we introduce node specific parameters to account for unequal mutual repression between Hb-Kni ($K_1$) and Gt-Kr ($K_2$). This is Model B7. We further test the possibility of the node-specific parameter ($K_3$) controlling Bicoid activation of three gap genes - Knirps, Hunchback and Giant. This is Model C8. In addition to this, certain studies have indicated the possibility of Bicoid activating Kruppel {\cite{knipple85, Becker13}, we also test for the evidence of this} by adding an extra edge to Models B7 and C8. These are models D7 and D8. All model specifications are described in table 1.
+
+\begin{figure}
+    \centering
+    \includegraphics[height = 10cm, width = 10cm]{tex/embryo/figure-2.png}
+    \caption{Gap gene network showing regulatory interactions between maternal genes, Bicoid (Bcd) \& Caudal (Cad), and gap genes (Knirps (Kni), Hunchback (Hb), Kruppel (Kr), Giant (Gt)). Two types of binding affinity parameters are shown - global (K) and edge-specific ($K_1, K_2, K_3$). We also investigate evidence for Bicoid activation of Kruppel (shown as dashed arrow).}
+    \label{fig:figure-2}
+\end{figure}
+
+
+\begin{table}[h]
+\centering
+
+\begin{tabular}{lllllll}
+\hline
+\multicolumn{1}{l|}{Models} & \multicolumn{1}{l|}{A6} & \multicolumn{1}{l|}{B7} & \multicolumn{1}{l|}{B7r} & \multicolumn{1}{l|}{C8} & \multicolumn{1}{l|}{D7} & \multicolumn{1}{l}{D8} \\ \hline
+\multicolumn{7}{l}{Global parameters:} \\ \hline
+Affinity(logKa) & $K$   & $K$   & $K$   &        $K$               &            $K$          &           $K$ \\
+Cooperativity   & $C_o$ & $C_o$ & $C_o$ &       $C_o$                &               $C_o$        &           $C_o$            \\
+Binding Sites   & $N_s$ & $N_s$ & $N_s$ &             $N_s$          &            $N_s$           &             $N_s$          \\
+Syn./Decay      & $\alpha$ & $\alpha$ & $\alpha$                   &     $\alpha$                  &        $\alpha$               &      $\alpha$                 \\
+Diffusion       & D & D & D &            D           &                 D      &               D        \\
+Max. conc       & 50 & 50 &           50            &          50             &          50             &         50              \\ \hline
+%\multicolumn{7}{|l|}{Node-specific binding affinities:}
+\multicolumn{7}{l}{Node-specific binding affinities:}                             \\ \hline
+$Bcd^A$  & \textcolor{gray}{$K$} & \textcolor{gray}{$K$} & \textcolor{red}{$K_3$} & \textcolor{red}{$K_3$} & \textcolor{gray}{$K$} & \textcolor{red}{$K_3$} \\
+$Bcd^R$                       &      \textcolor{gray}{$K$}                  &             \textcolor{gray}{$K$}           &       \textcolor{gray}{$K$}                 &      \textcolor{gray}{$K$}                  &       \textcolor{gray}{$K$}                 &         \textcolor{gray}{$K$}               \\
+$Cad^A$                       &      \textcolor{gray}{$K$}                  &                \textcolor{gray}{$K$}        &     \textcolor{gray}{$K$}                   &         \textcolor{gray}{$K$}              &             \textcolor{gray}{$K$}           &          \textcolor{gray}{$K$}              \\
+$Hb^A$                       &         \textcolor{gray}{$K$}               &             \textcolor{gray}{$K$}           &        \textcolor{gray}{$K$}                &          \textcolor{gray}{$K$}              &        \textcolor{gray}{$K$}                &        \textcolor{gray}{$K$}                \\
+$Hb^D$                       &       \textcolor{gray}{$K$}                 &          \textcolor{gray}{$K$}              &      \textcolor{gray}{$K$}                  &           \textcolor{gray}{$K$}             &          \textcolor{gray}{$K$}              &           \textcolor{gray}{$K$}             \\
+$Hb^R$                       &         \textcolor{blue}{$K_1$}               &           \textcolor{blue}{$K_1$}             &       \textcolor{blue}{$K_1$}                &              \textcolor{blue}{$K_1$}          &         \textcolor{blue}{$K_1$}              &       \textcolor{blue}{$K_1$}                 \\
+$Gt^R$                       &     \textcolor{gray}{$K$}                  &              \textcolor{gray}{$K$}          &      \textcolor{gray}{$K$}                  &            \textcolor{gray}{$K$}            &        \textcolor{gray}{$K$}                &      \textcolor{gray}{$K$}                  \\
+$Kr^R$                       &          \textcolor{gray}{$K_1$}              &              \textcolor{green}{$K_2$}          &       \textcolor{gray}{$K_1$}                 &             \textcolor{green}{$K_2$}           &           \textcolor{green}{$K_2$}             &         \textcolor{green}{$K_2$}               \\
+$Kni^R$                       &        \textcolor{gray}{$K$}                &         \textcolor{gray}{$K$}               &       \textcolor{gray}{$K$}                 &             \textcolor{gray}{$K$}           &           \textcolor{gray}{$K$}             &         \textcolor{gray}{$K$}               \\
+$Tll^R$                       &      \textcolor{gray}{$K$}                  &         \textcolor{gray}{$K$}               &        \textcolor{gray}{$K$}                &                \textcolor{gray}{$K$}        &            \textcolor{gray}{$K$}            &         \textcolor{gray}{$K$}               \\ \hline
+Open Parameters:  &  6  &          7             &       7                &           8            &           7            &             8          \\ \hline
+\end{tabular}
+\vspace{0.25in}
+\caption{Specifications for all 6 models evaluated. Models D7 and D8 have an extra edge for the activation of Bicoid by Kruppel. Also shown is the break up of global and node-specific parameters for different models. $Hb^{D}$ indicates parameter for the dual regulatory action of Hunchback on Kruppel.}
+\label{tab:table1}
+\end{table}
+
+
+In their paper, Papatsenko \& Levine \cite{papatsenko11} fit each of the models (A6, B7 and C8) separately by maximizing an objective function based on the correlation measured between the model and the data. They use the final correlation value to distinguish between the models. Their formulation and analysis showed that the gap gene network can be modeled using a more modular approach, involving two relatively independent network domains. In addition, they show close agreement of parameter estimates and experimentally observed values for most parameters. However, their approach to compare the models themselves is slightly problematic as it does not apply appropriate penalties for increasing model dimensionality. Bayes factors apply this penalty implicitly and so adhere to the notion of Occam's razor of favoring simple hypothesis over complex ones. Moreover, Papatsenko \& Levine do not offer a measure of statistical significance to justify model choice and rely on an ad-hoc notion of over-fitting. We enhance their fundamentally sound approach by allowing for statistically rigorous model selection and also allow for comparing competing network hypothesis. 
+
+\subsection{Efficient model solver}
+The approach of Papatsenko \& Levine for solving the system of partial differential equations was to use a forward Euler integration loop in which diffusion is simulated by a Gaussian filter. However, the implementation of the solver was much too slow for a Bayesian analysis, where one may have to run upwards of a million iterations. To overcome this, we solved the system by the method of semi-groups. This gives rise to an iterative solution that can easily be vectorized and is numerically efficient. Our solver is an order of magnitude faster than the solver due to Papatsenko \& Levine (fig. \ref{fig:runtime}).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.55]{tex/embryo/runtime.png}
+\caption{Unnormalized density function for the double potential well. ($\gamma = 4$)}
+\label{fig:runtime}
+\end{figure}
+
+\subsection{Fitting to simulated data \& identifiability}
+\begin{figure}[h!]
+\centering
+	\includegraphics[height = 15cm, width =15cm]{tex/embryo/corner.png}
+\caption{Corner plot \cite{corner} showing pair-wise joint densities of parameter for model C8. Simulated data, generated by adding noise to the output of the model with known parameters, was used to fit the model. The true values of the parameters are shown with blue lines. We see a strong negative correlation between the number of binding sites parameters, $N_s$, and the binding affinity parameters, $K, K_1, K_2, K_3$.}
+\label{fig:corner}
+\end{figure}
+
+To investigate the structural properties of the Papatsenko-Levine formalism, we fit the  model C8 (largest number of parameters) to simulated data generated with a known parameter set. The simulated data is contaminated with Gaussian noise having zero mean and 0.1 variance. The parallel tempering sampler was used to fit the model to simulated data using 100,000 generations. As can be seen in fig.  \ref{fig:corner}, the parameters $\alpha$, $D$ and $Co$ are recovered and show no confounding. However, it can be seen that the parameter for number of sites parameters ($Ns$) is negatively correlated with binding affinities ($K1$, $K2$, $K3$). The binding affinities themselves are positively correlated. This points towards structural identifiability issues, but also is slightly intuitive as weaker binding affinity can be compensated by a increase in the number of `weak' binding sites. We also want to point out that any identifiability issues can be integrated out in the calculation of the marginal likelihood in a Bayesian framework and as such model selection can still be performed.
+
+\subsection{Convergence of MCMC runs}
+
+Time to convergence for MCMC samplers can be sensitive to initial start points. To overcome this, some approaches try to initialize the sampler from the MLE estimate of the likelihood function. This approach suffers from the same pitfalls as optimization algorithms, in that the sampler may not sample the whole likelihood space and the evidence of convergence may be misleading.
+
+To ensure that the sampler had indeed converged, we initialized the chain from random start points drawn from a uniform prior. We used the Gelman-Rubin statistic \cite{brooks97} to monitor convergence of the chains. This diagnostic uses multiple chains to check for lack of convergence, and is based on the notion that if multiple chains have converged, by definition they should appear very similar to one another. The Gelman-Rubin statistic uses an analysis of variance approach to assessing convergence by calculating both the between-chain variance and within-chain variance to assess whether chains have indeed converged. We used the gelman.plot() function from the R \cite{r08} package coda \cite{plummer06} to plot the Gelman-Rubin statistic. It calculates the Gelman-Rubin shrink factor ($R$) repeatedly, first calculating with 50 observations and then adding bins of 10 observations iteratively. For convergence, we would ideally want the shrink factor to be below 1.2. 
+
+Posteriors samples generated by fitting the data to simulated data showed evidence of confounding between a set of parameters (fig. \ref{fig:corner}). So, we used the convergence criteria on the likelihoods of the models. Figure \ref{fig:figure-3} shows the gelman-rubin statistic for four models. We see that the shrink factor drops sharply with number of iterations of the chain for all models. This implies that the chains have, indeed, converged. 
+
+\begin{figure}[h!]
+\includegraphics[height = 12cm, width = 13.5cm]{tex/embryo/figure-3.png}
+  \caption{MCMC convergence diagnostics: Gelman plot showing the evolution of the gelmna-rubin statistic for four models (A6, B7, B7r, C8) as a function of iterations. The diagnostic metric was evaluated for 10 independent chains with random start points for each model. Values less 1.2 imply good mixing of the chains. Diagnostic plots for other models can be found in Additional File 1.}
+\label{fig:figure-3}
+\end{figure}
+
+
+
+
+\subsection{Marginal likelihood and Bayes factors}
+
+The output from the PT-MCMC at different temperatures was used for computing the marginal likelihood. For each model, we computed the estimate of the log of the marginal likelihood estimate from 10 parallel runs using thermodynamic integration (see methods). 10 independent runs of the sampler were used to compute the estimate and are shown in fig. \ref{fig:logML}. The estimates show low variability. Based on the log of the marginal likelihood, it is straightforward to compute the Bayes factors (see table \ref{table2} for interpretation of Bayes factors). We find that the Bayes factor for model C8 over model B7 is very strong. However, there isn't strong evidence supporting model D8 over model C8. This leads us to believe that there isn't strong evidence from the data to support Bicoid activation of Kruppel. However, the data does support a different distribution for the node specific parameter describing the binding affinity of Bicoid. This is evidenced by the fact that there isn't strong evidence for model C8 over model B7r. 
+
+\begin{figure}
+\centering
+\includegraphics[height = 10cm, width = 10cm]{tex/embryo/figure-4.png}
+\caption{Thermodynamic estimate of the logarithm marginal likelihood for all models. Estimates were generated for 10 independent runs for each model and show low variance. Difference between the estimates for models reveals the log Bayes factor that can be used for model comparison (see table \ref{table2}). We see that addition of a node specific-parameter for Bicoid improves the model fit in a statistically significant manner.}
+\label{fig:logML}
+\end{figure}
+
+%\hl{It might be pertinent here to contrast the model selection approach under the Bayesian paradigm to the model validation approach of cross-validation {\cite{Kohavi95astudy}}. Cross-validation is a popular approach to characterize over-fitting of models to the data. Here, we can envisage, excluding some of the data during model fitting step (validation set) and then testing the accuracy of the model on this held-out data set. However, the process of model selection described here, infact, helps guard against such over-fitting by over-parameterized models by penalizing them implicitly for higher dimensionality. This ability of Bayes factors to guard agianst over-fitting has also been discussed elsewhere {\cite{jeffreys92}\cite{girolami08a}} and offers similar advantages like the cross-validation approach. } 
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\hline
+$2log_{e}(B)$ & $B$ & Evidence against $H_0$ \\ \hline
+0 to 2 & 1 to 3 & Not worth more than a bare mention \\
+2 to 6 & 3 to 20 & Substantial                      \\
+6 to 10 & 20 to 150 & Strong                      \\
+$> 10$ & $> 150$ & Very strong                      \\ \hline
+\end{tabular}
+\vspace{0.25in}
+\caption{Criteria due to Kass \& Rafferty \cite{raftery95} for interpretation of Bayes factor as evidence support categories.}
+\label{table2}
+\end{table}
+
+\subsection{Gene expression profiles}
+Model outcomes were generated by sampling from the joint posterior of the model parameters. For each model, 100 samples were taken from the joint distribution and the model outcomes generated by using the parameter set (see fig. \ref{fig:figure-5}). The basic model with 6 parameters (model A6) also captures the main features of the expression pattern, showing that the inference procedure is able to sample from the correct posterior. As the likelihood is computed only within certain domains (shown by vertical dotted lines for each gap gene in fig. \ref{fig:figure-5}), model outcomes show higher variability outside these domains. Most noticeable is the posterior shift of Hunchback expression seen in models B7r and C8. This shows that a different distribution of Bicoid binding affinity from the global affinity parameter is sufficient to capture the characteristic expression curve of Hunchback. Increasing the number of parameters from 7 to 8 improves the model fit (as judged from the marginal likelihood), it does so not in a statistically significant manner. The model outcomes for models D7 \& D8, that describe models with an extra regulatory edge for Bicoid, can be found in fig. \ref{fig:model-predictions-d7-d8}. 
+
+\begin{figure}[h!]
+\centering
+\includegraphics[height = 10cm, width = 12.5cm]{embryo/figure-5.png}
+\caption{Gene expression profiles for Models A6, B7, B7r, C8. Black lines show observed values and blue lines are model outcomes by sampling parameters from the joint posterior. For each model, 100 samples were drawn from the joint posterior of model parameters. Vertical dotted lines show domains over which the likelihood was computed.}
+\label{fig:figure-5}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[height = 8cm, width = 12.5cm]{embryo/model-predictions-d7-d8.png}
+\caption{Gene Expression profiles for models D7, D8. Black lines show observed values and blue lines are model outcomes by sampling parameters from the joint posterior. For each model, 100 samples were drawn. Vertical dotted lines show domains over which the likelihood was computed.}
+\label{fig:model-predictions-d7-d8}
+\end{figure}
+
+\subsection{Over-fitting analysis}
+We tested the best performing model (according to Bayes factor criteria), model B7r, for over-fitting. We used a modified cross-validation (CV) approach for testing over-fitting (see methods). In each CV-fold, we fit the model to the training set and then draw 100 samples from the posterior parameter distribution. The posterior samples are used to predict values for the held out set. We use the mean log-likelihood metric as prediction accuracy measure. As a Gaussian error model is used, the mean log-likelihood is proportional to the residual error in this case.  The mean log-likelihood for the cross validation set is 0.314 ($\pm$ 0.024). The mean log-likelihood using samples from posterior parameter distribution generated using the complete data is 0.326 ($\pm$ 0.061). Using a Student's t-test with Welch modification, we found the difference in means to not be statistically significant ($P > 0.05$) indicating that the model doesn't over-fit the data.
+
+\section{Conclusions}
+
+Recovering gene regulatory network information from expression data is a key problem in systems biology. Particularly in the study of the segmentation pathway for early \textit{Drosophila} embryo, various modeling approaches have been taken \cite{jaeger04b, jaeger06b, papatsenko11}. However, most of these modeling approaches rely on the assessment of a single candidate model. This sort of approach has been previously argued against \cite{chamberlin1890} as it doesn't pay heed to competing hypotheses and hence, other plausible explanations. In addition, inference in these approaches rely on optimization techniques which do not account for uncertainty in experimental measurements. Optimization approaches try to offer measures of parameter certainty through sensitivity analysis but, barring certain studies \cite{Rodriguez13}, the issue of comparing models has been largely unaddressed. 
+
+We do note that there have been some attempts \cite{odell00} at doing model selection in the \textit{Drosophila} embryo. However, the application of a structured framework in which models can be compared is still elusive. Doing the analysis in a Bayesian framework provides a more standard procedure to address both the issues of performing inference regarding different models and to assess the uncertainty of parameter estimates. An important issue when working with dynamical models is the issue of identifiability \cite{Raue14, Oana11, Villaverde16, Becker13} - the ability to unqiuely estimate parameters of the model given the data. In the Bayesian context, \textit{a priori} identifiability issues can be detected by examining the covariance structure of the full parameter posterior distribution. Parameters that are confounded will be tightly correlated. Identifiability issues can be surmounted by providing a more informative prior that more tightly constrains confounded parameters. In our case, however, we have chosen to work with uniform priors to indicate that our knowledge of the system is still evolving. Indeterminacy of model parameters are incorporated into the marginal likelihood, allowing one to still perform model selection. However, parameter relationships can still uncover important mechanisms. In our study, we find that the parameters for binding affinity and number of sites are negatively correlated (fig. \ref{fig:corner}). Such a relationship is expected as it indicates that a transcription factor can modulate gene expression by either binding strongly to a few sites or through weak binding to multiple sites. Similar to our study, Chertkova \emph{et al.} \cite{Chertkova2017}, show that loss of transcription factor binding sites in \emph{in silico} models results in increase in binding affinity of transcription factors, supporting negative correlation between these parameters in order to maintain gene expression. 
+
+In the Bayesian framework, Bayes factors provide a means of doing model selection and have been employed to compare between ODE based models \cite{calderhead10, girolami08b, schmidl12, lygeros10}. We show here that similar approaches can be used for doing model selection in the context of PDE models for spatial patterning. An advantage of the Bayesian model selection paradigm using Bayes factors is that it doesn't require models to be nested, i.e models need not follow a set hierarchy where all models may be derived from an extended parameterized model. This particularly advantageous when we attempt to test hypotheses involving different network topologies. Samples from the posterior of parameter distribution were generated using the parallel tempering (PT-MCMC) sampler. This sampling approach can be easily combined with the numerically stable thermodynamic integration method to estimate marginal likelihood for each of the competing models. These estimates in turn can be used to compute Bayes factors. Our analysis shows that besides the global binding affinity parameter, a different node-specific parameter is required for describing the regulatory effect of Bicoid on its target genes. This may point to the fact that the molecular mechanism of activation by Bicoid is different from other maternal/gap genes. The node-specific Bicoid binding affinity parameter helps account for a posterior shift of Hunchback expression. A candidate hypothesis for the activation of Kruppel by Bicoid was also tested for. Our analysis offers little support for the activation of Kruppel by Bicoid. 
+
+Our study seeks to provide a statistical framework in which predicted expreimental hypothesis can be tested. In addition, the model selection procedure also ensures that a minimal model for gap gene expression can be formulated. 
+
+We point out that as the computation of posterior probabilities in Bayesian analysis involves integration over high-dimensional parameter spaces, sampling from higher dimensions becomes increasingly difficult. This is a particular limitation for the large parameter models that we see in systems biology. While there has been some progress in Bayesian parameter estimation in high-dimensions \cite{theis13}, this problem is far from solved. However, there might be some justification in criticism that these high-dimension models also tend to be over-parameterized and thus too flexible. One approach would be do a hierarchical Bayesian analysis \cite{Carlin_Empirical_2000} to constrain parameter sets in order to prevent the problem of over-fitting and estimation in higher dimensions. 

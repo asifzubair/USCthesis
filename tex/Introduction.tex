@@ -1,13 +1,44 @@
-\chapter{Introduction}
+\chapter{Introduction \& Overview}
 \label{cha:introduction}
 
-This chapter talks about motivation and applications of my work, and reviews previous research in the field.
+%This chapter talks about motivation and applications of my work, and reviews previous research in the field.
 
-\section{Motivations}
-\label{sec:motivations}
+%\section{Motivations}
+%\label{sec:motivations}
 
-Previous research\cite{Fisher:1954} \cite{Robbins:1951aa} \cite{Knight:1921} in the field of X has established that method A is very useful.
-Another branch of researchers\cite{Wright:1921aa} \cite{Caratheodory:1909aa} \cite{Gibbs:1902} \cite{Clausius:1857} have figured out that method B could be better in certain occasions.
-Here I propose a new method that gives results better than both types.
+%Previous research\cite{Fisher:1954} \cite{Robbins:1951aa} \cite{Knight:1921} in the field of X has established that method A is very useful.
+%Another branch of researchers\cite{Wright:1921aa} \cite{Caratheodory:1909aa} \cite{Gibbs:1902} \cite{Clausius:1857} have figured out that method B could be better in certain occasions.
+%Here I propose a new method that gives results better than both types.
 
-\Blindtext[1]
+Here I present a brief overview of the chapters in the dissertation. 
+
+
+%embryo
+In chapter \ref{cha:research_topic_1}, I address the problem of spatial pattering in \emph{Drosophila} embryos, specifically the gap gene system. The gap gene system controls the early cascade of the segmentation pathway in Drosophila melanogaster as well as other insects. Owing to its tractability and key role in embryo patterning, this system has been the focus for both computational modelers and experimentalists. The gap gene expression dynamics can be considered strictly as a one-dimensional process and modeled as a system of reaction-diffusion equations. While substantial progress has been made in modeling this phenomenon, there still remains a deficit of approaches to evaluate competing hypotheses. Most of the model development has happened in isolation and there has been little attempt to compare candidate models.
+
+The Bayesian framework offers a means of doing formal model evaluation. Here, we demonstrate how this framework can be used to compare different models of gene expression. We focus on the Papatsenko-Levine formalism, which exploits a fractional occupancy based approach to incorporate activation of the gap genes by the maternal genes and cross-regulation by the gap genes themselves. The Bayesian approach provides insight about relationship between system parameters. In the regulatory pathway of segmentation, the parameters for number of binding sites and binding affinity have a negative correlation. The model selection analysis supports a stronger binding affinity for Bicoid compared to other regulatory edges, as shown by a larger posterior mean. The procedure doesn’t show support for activation of Kruppel by Bicoid.
+We provide an efficient solver for the general representation of the Papatsenko-Levine model. We also demonstrate the utility of Bayes factor for evaluating candidate models for spatial pattering models. In addition, by using the parallel tempering sampler, the convergence of Markov chains can be remarkably improved and robust estimates of Bayes factors obtained.
+
+%chickpea
+Chapter \ref{cha:research_topic_2} introduces nested association mapping (NAM) populations for chickpea hybrids. NAM populations utilize the framework of common reference design to produce synthetic
+mapping populations that take advantage of both historic and recent recombination events such
+that marker density requirement is kept low while having higher allelic richness and statistical
+power. Pursuant of this aim, and keeping in mind that our goal is to introgress favourable alleles
+from wild populations into cultivated varieties, crosses of wild chickpea species, C. reticulatum, called wild founders, were made with three different elite cultivars.
+
+In the present analysis, we examine hybrid crosses of wild founders with the elite cultivar,
+ICCV96029. Limiting ourselves to species divergent markers, we conduct an association study
+with six continuous phenotypes including important traits like yield and shattering index. This
+reveals important features of the genomic architecture underlying these traits. 
+
+Having provided an introduction to the Bayesian framework and an analysis for association mapping in chickpea hybrids, chapter \ref{cha:research_topic_3} provides a perspective on how the Bayesian approach can be used to improve association mapping. The power of genome-wide association studies (GWAS) rests on several foundations: (i) there is a significant amount of additive genetic variation, (ii) individual causal polymorphisms often have sizable effects and (iii) they segregate at moderate-to- intermediate frequencies, or will be effectively ‘tagged’ by polymorphisms that do. Each of these assumptions has recently been questioned. (i) Why should genetic variation appear additive given that the underlying molecular networks are highly nonlinear? (ii) A new generation of relatedness-based analyses directs us back to the nearly infinitesimal model for effect sizes that quantitative genetics was long based upon. (iii) Larger effect causal polymorphisms are often low frequency, as selection might lead us to expect. 
+
+In chapter \ref{cha:research_topic_3}, we review these issues and other findings that appear to question many of the foundations of the optimism GWAS prompted. We then present a roadmap emerging as one possible future for quantitative genetics. We argue that in future GWAS should move beyond purely statistical grounds. One promising approach is to build upon the combination of population genetic models and molecular biological knowledge. This combined treatment, however, requires fitting experimental data to models that are very complex, as well as accurate capturing of the uncertainty of resulting inference. This problem can be resolved through Bayesian analysis and tools such as approximate Bayesian computational method growing in popularity in population genetic analysis. We show a case example of anterior-posterior segmentation in Drosophila, and argue that similar approaches will be helpful as a GWAS augmentation, in human and agricultural research.
+
+Finally, in chapter \ref{cha:research_topic_4}, I discuss an important analysis on transposable elements (TEs) and their implication in cancer progression and relapse. Genomic transposable elements comprise nearly half of the human genome. The expression of TEs is considered potentially hazardous, as it can lead to insertional mutagenesis and genomic instability. However, recent studies have revealed that TEs are involved in immune-mediated cell clearance. 
+
+Hypomethylating agents can increase the expression of TEs in cancer cells, inducing `viral mimicry', causing interferon signalling and cancer cell killing. To investigate the role of TEs in the pathogenesis of acute myeloid leukaemia (AML), we studied TE expression in several cell fractions of AML while tracking its development (pre-leukemic haematopoietic stem cells, leukemic stem cells (LSCs), and leukemic blasts) and chromatin accessibility in these cells. 
+
+LSCs, which are resistant to chemotherapy and serve as reservoirs for relapse, showed significant suppression of TEs and interferon pathways. We propose TE suppression as a mechanism for immune escape in AML. Repression of TEs co-occurred with the upregulation of several genes known to modulate TE expression, such as RNA helicases and autophagy genes. Thus, we have identified potential pathways that can be targeted to activate cancer immunogenicity via TEs in AML.
+
+All published work is indicated with a reference number in the title of the chapters. Additionally, in Appendix \ref{appendix}, I list side projects that I worked on and that have been published. 
